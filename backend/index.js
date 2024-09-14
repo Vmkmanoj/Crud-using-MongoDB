@@ -31,6 +31,25 @@ module.exports = student;
 
 
 
+app.post("/create", async (req,res)=>{
+
+    const {StudentId,name,age,grade} = req.body;
+
+    try{
+        const Student =  new Student ({StudentId,name,age,grade});
+        await Student.save();
+        res.status(201).json(student)
+    }catch(error){
+        res.status(404).json({message : error.message, success : false})
+    }
+
+
+
+
+})
+
+
+
 app.get('/',(req,res)=>[
     res.send("hello world")
 ])

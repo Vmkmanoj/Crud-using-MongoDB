@@ -1,59 +1,73 @@
-const express = require("express")
-const body_parser = require("body-parser")
-const cros = require("cors")
-const prot = 5000;
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");  // Fixed typo here
+const port = 5000;  // Renamed from prot to port for clarity
 const app = express();
 const mongoose = require("mongoose");
-const { type } = require("os");
 
+// Middlewares
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-app.use(cros());
-app.use(body_parser.urlencoded({extended:true}));
-app.use(body_parser.json());
+// MongoDB Connection
+mongoose.connect('mongodb+srv://vmkmano13:13-Aug-2000@student-data.sirqh.mongodb.net/?retryWrites=true&w=majority&appName=Student-data', {
+}).then(() => {
+    console.log("MongoDB connected");
+}).catch((error) => {
+    console.error("MongoDB connection error:", error);
+});
 
-mongoose.connect('mongodb+srv://vmkmano13:13-Aug-2000@student-data.sirqh.mongodb.net/?retryWrites=true&w=majority&appName=Student-data',{
-}).then(()=>{
-    console.log("mango db connected")
-}).catch(()=>{
-    console.log("mongo db error");
-})
-
-const studentschema = new mongoose.Schema({
-    StudentId : {type : String,required : true},
+// Student Schema and Model
+const studentSchema = new mongoose.Schema({
+    studentId: { type: String, required: true },  // Use lowercase `studentId` to match client-side
     name: { type: String, required: true },
-  age: { type: Number, required: true },
-  grade: { type: String, required: true }
-})
+    age: { type: Number, required: true },
+    grade: { type: String, required: true }
+});
 
-const student = mongoose.model('student' , studentschema);
+const Student = mongoose.model('student', studentSchema);  // Changed variable to `Student`
 
-module.exports = student;
-
-
-
-app.post("/create", async (req,res)=>{
-
-    const {StudentId,name,age,grade} = req.body;
-
-    try{
-        const Student =  new Student ({StudentId,name,age,grade});
-        await Student.save();
-        res.status(201).json(student)
-    }catch(error){
-        res.status(404).json({message : error.message, success : false})
+// Routes
+app.post("/create", async (req, res) => {
+    const { studentId, name, age, grade } = req.body;
+    try {
+        const newStudent = new Student({ studentId, name, age, grade });  // Renamed to `newStudent`
+        await newStudent.save();
+        res.status(201).json(newStudent);  // Respond with created student data
+    } catch (error) {
+        res.status(500).json({ message: error.message, success: false });
     }
+});
+
+//get id
+
+app.get('/read/:id', async (req, res) => {
+    try {
+      // Use await to ensure the database operation completes before moving forward
+      const student = await Student.findOne({ studentId: req.params.id });
+  
+      if (student) {
+        // If the student is found, send the student data as JSON
+        res.json(student);
+      } else {
+        // If no student is found, return a 404 status with a message
+        res.status(404).json({ message: 'Student not found' });
+      }
+    } catch (error) {
+      // Handle any errors during the database query
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
 
 
+app.get('/', (req, res) => {
+    res.send("Hello World");
+});
 
-
-})
-
-
-
-app.get('/',(req,res)=>[
-    res.send("hello world")
-])
-
-app.listen(prot,()=>{
-    console.log(`server is running on ${prot}`)
-})
+// Server listening
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});

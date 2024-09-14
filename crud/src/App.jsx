@@ -1,31 +1,86 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
+import axios from "axios";
+// import student from '../../backend';
 
 function App() {
+
+  const [createuser,setCreateuser] = useState({  
+    studentId: '',
+    name: '',
+    age: '',
+    grade: ''
+  })
+
+  const [findindid,setFindingid] = useState();
+
+    const handleChanges = (e) => {
+      const { name, value } = e.target;
+      setCreateuser((prevState) => ({
+        ...prevState,
+        [name]: value
+      }));
+    };
+
+
+  const create_user = async (e) =>{
+
+    if(e)e.preventDefault()
+    const api =  await fetch ("http://localhost:5000/create",{
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/json'
+      },
+      
+      body : JSON.stringify(createuser)
+    })
+    const res = await api.json();
+    console.log(res);
+  }
+
+
+  const findindId = async (e) => {
+
+    if(e)e.preventDefault();
+
+    const api = await fetch(`http://localhost:5000/read/${findindid}`,{
+
+      method : 'get',
+      headers : {'Content-Type' : 'application/json'}
+
+    })
+    const res = await api.json()
+
+    console.log(res);
+
+
+  }
+
+
   
   
-  
+
 
   return (
     <>
       <h1>Student Management System</h1>
       <h2>Create Student</h2>
-      <form action="/create" method="post">
+      <form onSubmit={create_user}>
         <label htmlFor="id">Student ID:</label>
-        <input type="text" id="id" name="id" required /><br />
+        <input type="text" id="id" name="studentId" value={createuser.studentId} onChange={handleChanges} required /><br />
         <label htmlFor="name">Name:</label>
-        <input type="text" id="name" name="name" required /><br />
+        <input type="text" id="name" name="name" value={createuser.name} onChange={handleChanges} required /><br />
         <label htmlFor="age">Age:</label>
-        <input type="number" id="age" name="age" required /><br />
+        <input type="number" id="age" name="age" value={createuser.age} onChange={handleChanges} required /><br />
         <label htmlFor="grade">Grade:</label>
-        <input type="text" id="grade" name="grade" required /><br />
+        <input type="text" id="grade" name="grade" value={createuser.grade} onChange={handleChanges} required /><br />
         <button type="submit">Create</button>
       </form>
 
       <h2>Read Student</h2>
-      <form action="/read" method="get">
+      <form  onSubmit={findindId}>
         <label htmlFor="studentId">Student ID:</label>
-        <input type="text" id="studentId" name="studentId" required /><br />
+        <input type="text" id="studentId" name="studentId" value={findindid} onChange={(e)=>setFindingid(e.target.value)}/><br />
         <button type="submit">Read Student</button>
       </form>
 

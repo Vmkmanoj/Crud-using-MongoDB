@@ -60,6 +60,27 @@ app.get('/read/:id', async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   });
+
+  app.delete('/delete/:id', async (req, res) => {
+    try {
+      // Find and delete the student by studentId
+      const student = await Student.findOneAndDelete({ studentId: req.params.id });
+  
+      if (student) {
+        // Send a success response with a 200 status code or a 204 status code
+        res.status(200).json({ message: "Student data deleted successfully" });
+        // Alternatively, you can use res.sendStatus(204) for no content
+      } else {
+        res.status(404).json({ message: "Student not found" });
+      }
+    } catch (error) {
+      // Catch any server errors and return a 500 status
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  
   
 
 

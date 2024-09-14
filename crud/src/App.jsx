@@ -14,6 +14,8 @@ function App() {
 
   const [findindid,setFindingid] = useState();
 
+  const [deleteid,setDeleteid] = useState();
+
     const handleChanges = (e) => {
       const { name, value } = e.target;
       setCreateuser((prevState) => ({
@@ -23,6 +25,8 @@ function App() {
     };
 
 
+
+///creating user 
   const create_user = async (e) =>{
 
     if(e)e.preventDefault()
@@ -31,13 +35,14 @@ function App() {
       headers : {
         'Content-Type' : 'application/json'
       },
-      
+
       body : JSON.stringify(createuser)
     })
     const res = await api.json();
     console.log(res);
   }
 
+//finding user
 
   const findindId = async (e) => {
 
@@ -52,10 +57,34 @@ function App() {
     const res = await api.json()
 
     console.log(res);
-
-
   }
 
+  //deleting user
+
+  const deleteId = async (e) => {
+    if (e) e.preventDefault();
+  
+    try {
+      const api = await fetch(`http://localhost:5000/delete/${deleteid}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (api.ok) {
+        const res = await api.json();
+        console.log(res);
+      } else {
+        const error = await api.json();
+        console.error('Error:', error.message);
+      }
+    } catch (error) {
+      console.error('Network or server error:', error);
+    }
+  };
+  
+  
 
   
   
@@ -98,9 +127,9 @@ function App() {
       </form>
 
       <h2>Delete Student</h2>
-      <form action="/delete/:id" method="post">
+      <form onSubmit={deleteId}>
         <label htmlFor="deleteId">Student ID:</label>
-        <input type="text" id="deleteId" name="id" required /><br />
+        <input type="text" id="deleteId" name="id" value={deleteid} onChange={(e)=>setDeleteid(e.target.value)} required /><br />
         <button type="submit">Delete</button>
       </form>
     </>

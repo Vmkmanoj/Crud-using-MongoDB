@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");  // Fixed typo here
-const port = 5000;  // Renamed from prot to port for clarity
+const cors = require("cors");  
+const port = 5000;  
 const app = express();
 const mongoose = require("mongoose");
 
@@ -20,21 +20,21 @@ mongoose.connect('mongodb+srv://vmkmano13:13-Aug-2000@student-data.sirqh.mongodb
 
 // Student Schema and Model
 const studentSchema = new mongoose.Schema({
-    studentId: { type: String, required: true },  // Use lowercase `studentId` to match client-side
+    studentId: { type: String, required: true }, 
     name: { type: String, required: true },
     age: { type: Number, required: true },
     grade: { type: String, required: true }
 });
 
-const Student = mongoose.model('student', studentSchema);  // Changed variable to `Student`
+const Student = mongoose.model('student', studentSchema);  
 
 // Routes
 app.post("/create", async (req, res) => {
     const { studentId, name, age, grade } = req.body;
     try {
-        const newStudent = new Student({ studentId, name, age, grade });  // Renamed to `newStudent`
+        const newStudent = new Student({ studentId, name, age, grade }); 
         await newStudent.save();
-        res.status(201).json(newStudent);  // Respond with created student data
+        res.status(201).json(newStudent);  
     } catch (error) {
         res.status(500).json({ message: error.message, success: false });
     }
@@ -48,14 +48,14 @@ app.get('/read/:id', async (req, res) => {
       const student = await Student.findOne({ studentId: req.params.id });
   
       if (student) {
-        // If the student is found, send the student data as JSON
+      
         res.json(student);
       } else {
-        // If no student is found, return a 404 status with a message
+      
         res.status(404).json({ message: 'Student not found' });
       }
     } catch (error) {
-      // Handle any errors during the database query
+    
       console.error(error);
       res.status(500).json({ message: 'Server error' });
     }
@@ -78,6 +78,24 @@ app.get('/read/:id', async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Server error" });
     }
+  });
+
+
+  app.put('/update/:id',async (req, res) =>{
+
+    try{
+    const student = await Student.findOneAndUpdate({studentId : req.params.id},req.body,{new:true});
+
+    // const {studentId , name, age, grade } = req.body;
+    if(!student){
+      res.status(404).json({message : "id is not working"})
+    }
+  }catch(error){
+
+    res.status(400).json({message : error.message})
+
+  }
+
   });
   
   

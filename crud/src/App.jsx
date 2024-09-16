@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
-import axios from "axios";
+// import axios from "axios";
+// import { set } from 'mongoose';
+// import { json } from 'body-parser';
 // import student from '../../backend';
 
 function App() {
@@ -11,6 +13,15 @@ function App() {
     age: '',
     grade: ''
   })
+
+  const [update,setUpdate] = useState({  
+    studentId : '',
+    name: '',
+    age: '',
+    grade: ''
+  })
+
+  const [fetchingdata,setFetchingdata] = useState(null)
 
   const [findindid,setFindingid] = useState();
 
@@ -23,7 +34,13 @@ function App() {
         [name]: value
       }));
     };
-
+    const handleInputChange = (e) => {
+      const { name, value } = e.target;
+      setUpdate(prevState => ({
+        ...prevState,
+        [name]: value
+      }));
+    };
 
 
 ///creating user 
@@ -39,7 +56,9 @@ function App() {
       body : JSON.stringify(createuser)
     })
     const res = await api.json();
-    console.log(res);
+    if(res){
+      window.alert("Date add Created")
+    }
   }
 
 //finding user
@@ -56,7 +75,7 @@ function App() {
     })
     const res = await api.json()
 
-    console.log(res);
+    setFetchingdata(res)
   }
 
   //deleting user
@@ -74,15 +93,60 @@ function App() {
   
       if (api.ok) {
         const res = await api.json();
-        console.log(res);
+        window.alert("data deleted")
       } else {
         const error = await api.json();
         console.error('Error:', error.message);
+        window.alert('data not found')
       }
     } catch (error) {
       console.error('Network or server error:', error);
     }
   };
+
+  //updating user
+
+
+const updatinguser = async(e)=>{
+
+  if(e) e.preventDefault();
+
+  const api = await fetch(`http://localhost:5000/update/${update.studentId}`,{
+    method : "PUT",
+
+    headers : {
+      'Content-Type':'application/json'
+    },
+
+    body : JSON.stringify( {name : update.name,
+      age:update.age,
+      grade : update.grade
+    })
+  })
+
+  if(api.ok){
+    const res = await api.json();
+    console.log(res)
+    window.alert('data updated')
+  }else{
+
+    window.alert('data not found')
+
+    const error =  await api.json()
+    
+    console.log(error.message);
+    
+    
+  }
+
+
+
+
+
+
+
+}
+
   
   
 
@@ -113,18 +177,37 @@ function App() {
         <button type="submit">Read Student</button>
       </form>
 
+      {fetchingdata &&(
+
+<div className="student-details">
+<p> Name: <span>{fetchingdata.name}</span> </p>
+<p> Age: <span>{fetchingdata.age}</span> </p>
+<p> Grade: <span>{fetchingdata.grade}</span> </p>
+<p> Student ID: <span>{fetchingdata.studentId}</span> </p>
+</div>
+
+      
+      )
+        
+        
+        
+        }
+
       <h2>Update Student</h2>
-      <form action="/update/:id" method="post">
+      <form onSubmit={updatinguser}>
         <label htmlFor="updateId">Student ID:</label>
-        <input type="text" id="updateId" name="id" required /><br />
+        <input type="text" id="updateId" name="studentId" value={update.studentId} onChange={handleInputChange} required /><br />
         <label htmlFor="newName">New Name:</label>
-        <input type="text" id="newName" name="name" required /><br />
+        <input type="text" id="newName" name="name" value={update.name} onChange={handleInputChange} required /><br />
         <label htmlFor="newAge">New Age:</label>
-        <input type="number" id="newAge" name="age" required /><br />
+        <input type="number" id="newAge" name="age" value={update.age} onChange={handleInputChange} required /><br />
         <label htmlFor="newGrade">New Grade:</label>
-        <input type="text" id="newGrade" name="grade" required /><br />
+        <input type="text" id="newGrade" name="grade" value={update.grade} onChange={handleInputChange} required /><br />
         <button type="submit">Update</button>
       </form>
+
+ 
+
 
       <h2>Delete Student</h2>
       <form onSubmit={deleteId}>

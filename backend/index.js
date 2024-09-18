@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");  
-const port = 5000;  
+const port = 5001;  
 const app = express();
 const mongoose = require("mongoose");
 
@@ -11,8 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://vmkmano13:13-Aug-2000@student-data.sirqh.mongodb.net/?retryWrites=true&w=majority&appName=Student-data', {
-}).then(() => {
+mongoose.connect('mongodb+srv://vmkmano13:13-Aug-2000@student-data.sirqh.mongodb.net/?retryWrites=true&w=majority&appName=Student-data').then(() => {
     console.log("MongoDB connected");
 }).catch((error) => {
     console.error("MongoDB connection error:", error);
